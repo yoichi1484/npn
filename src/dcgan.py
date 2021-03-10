@@ -33,7 +33,7 @@ parser.add_argument("--img_size", type=int, default=64, help="size of each image
 parser.add_argument("--channels", type=int, default=1, help="number of image channels")
 parser.add_argument("--dry_run", action='store_true', help="")
 parser.add_argument("--sample_interval", type=int, default=400, help="interval between image sampling")
-opt = parser.parse_args(args=[])
+opt = parser.parse_args()
 if opt.dry_run:
   n_data = 1
   opt.n_epochs = 1
