@@ -21,6 +21,7 @@ from neuplanet import NeuPlaNet
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--path_lc", type=str, help="path of light curve data")
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
 parser.add_argument("--batch_size", type=int, default=512, help="size of the batches")
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
@@ -145,8 +146,7 @@ transform = transforms.Compose(
             [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
             )
 
-#fluxes = np.load(" ")
-fluxes = make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot)
+fluxes = np.load(opt.path_lc)
 
 dataset = NeuPlaNet(
     path_dataset, 
