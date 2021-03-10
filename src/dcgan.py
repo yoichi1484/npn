@@ -21,7 +21,7 @@ from neuplanet import NeuPlaNet
 os.makedirs("images", exist_ok=True)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--path_lc", type=str, help="path of light curve data")
+parser.add_argument("--path_lc", type=str, required=True, help="path of light curve data")
 parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
 parser.add_argument("--batch_size", type=int, default=512, help="size of the batches")
 parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
