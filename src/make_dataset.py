@@ -14,6 +14,7 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot):
     files = sorted(glob("{}/*.png".format(path_dataset)))
     if n_data > 0:
       files = files[:n_data]
+    assert len(files) != 0
     light_curves = []
     for filename in tqdm(files):
         flux, _ = utils.get_light_curve(filename, ydeg, amp, obl, inc, npts, nrot)
