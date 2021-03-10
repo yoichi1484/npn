@@ -47,5 +47,5 @@ print("saving...")
 os.makedirs(args.path_save, exist_ok=True)
 with open('{}/configs.json'.format(args.path_save), 'w') as f:
   json.dump(args.__dict__, f)
-np.save(args.path_save + "flux", fluxes)
+np.save(args.path_save + "/flux", fluxes)
 print("done.")
