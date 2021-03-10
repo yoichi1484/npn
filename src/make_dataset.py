@@ -25,7 +25,7 @@ print("computing flux")
 fluxes = neuplanet.make_dataset(args.path_img, n_data, args.ydeg, args.amp, 
                                 args.obl, args.inc, args.npts, args.nrot)
 
-print("saving...)
+print("saving...")
 os.makedirs(args.path_save, exist_ok=True)
 with open('{}/configs.json'.format(args.path_save), 'w') as f:
   json.dump(args.__dict__, f)
