@@ -29,11 +29,11 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, opt):
+    def __init__(self, args):
         super(Generator, self).__init__()
 
-        self.init_size = opt.img_size // 4
-        self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, 128 * self.init_size ** 2))
+        self.init_size = args.img_size // 4
+        self.l1 = nn.Sequential(nn.Linear(args.latent_dim, 128 * self.init_size ** 2))
 
         self.conv_blocks = nn.Sequential(
             nn.BatchNorm2d(128),
@@ -45,7 +45,7 @@ class Generator(nn.Module):
             nn.Conv2d(128, 64, 3, stride=1, padding=1),
             nn.BatchNorm2d(64, 0.8),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(64, opt.channels, 3, stride=1, padding=1),
+            nn.Conv2d(64, args.channels, 3, stride=1, padding=1),
             nn.Tanh(),
         )
 
@@ -57,7 +57,7 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, opt):
+    def __init__(self, args):
         #self.i = 0
         super(Discriminator, self).__init__()
 
@@ -68,14 +68,14 @@ class Discriminator(nn.Module):
             return block
 
         self.model = nn.Sequential(
-            *discriminator_block(opt.channels, 16, bn=False),
+            *discriminator_block(args.channels, 16, bn=False),
             *discriminator_block(16, 32),
             *discriminator_block(32, 64),
             *discriminator_block(64, 128),
         )
 
         # The height and width of downsampled image
-        ds_size = opt.img_size // 2 ** 4
+        ds_size = args.img_size // 2 ** 4
         self.adv_layer = nn.Sequential(nn.Linear(128 * ds_size ** 2, 1), nn.Sigmoid())
 
     def forward(self, img):
@@ -97,20 +97,21 @@ def _parse():
     #parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
     parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
-    parser.add_argument("--dry_run", action='store_true', help="")
+    parser.add_argument("--dry_run", action='store_true', help="quickly check a single pass")
+    parser.add_argument("--gpu_id", type=int, default=-1, help="gpu device id. (cpu = -1)")
     parser.add_argument("--sample_interval", type=int, default=400, help="interval between image sampling")
     return parser.parse_args()
 
 def main():
-    opt = _parse()
+    args = _parse()
 
     os.makedirs("images", exist_ok=True)
-    if opt.dry_run:
+    if args.dry_run:
         n_data = 1
-        opt.n_epochs = 1
+        args.n_epochs = 1
 
     #cuda = True if torch.cuda.is_available() else False
-    device, use_cuda = utils.get_device(opt.gpu_id)
+    device, use_cuda = utils.get_device(args.gpu_id)
 
     """
     # Configure data loader
@@ -121,32 +122,33 @@ def main():
             train=True,
             download=True,
             transform=transforms.Compose(
-                [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
+                [transforms.Resize(args.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
             ),
         ),
-        batch_size=opt.batch_size,
+        batch_size=args.batch_size,
         shuffle=True,
     )
     """
     
     # Load flux data
-    fluxes = np.load(opt.path_lc)
+    fluxes = np.load(args.path_lc)
 
     # Configure data loader
     transform = transforms.Compose(
-                [transforms.Resize(opt.img_size), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])]
+                [transforms.Resize(args.img_size), transforms.ToTensor(), 
+                transforms.Normalize([0.5], [0.5])]
                 )
         
     dataset = NeuPlaNet(
         path_dataset, 
         fluxes = fluxes, 
         n_data = n_data, 
-        img_size = opt.img_size, 
+        img_size = args.img_size, 
         transform=transform)
     
     dataloader = torch.utils.data.DataLoader(
         dataset,
-        batch_size=opt.batch_size,
+        batch_size=args.batch_size,
         shuffle=True,
         )
     
@@ -154,12 +156,12 @@ def main():
     adversarial_loss = torch.nn.BCELoss()
     
     # Show configs
-    opt.latent_dim = fluxes.shape[1]
-    print(json.dumps(opt.__dict__, indent=2))
+    args.latent_dim = fluxes.shape[1]
+    print(json.dumps(args.__dict__, indent=2))
     
     # Initialize generator and discriminator
-    generator = Generator(opt)
-    discriminator = Discriminator(opt)
+    generator = Generator(args)
+    discriminator = Discriminator(args)
     
     if use_cuda:
         generator.cuda()
@@ -171,13 +173,15 @@ def main():
     discriminator.apply(weights_init_normal)
     
     # Optimizers
-    optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
-    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
+    optimizer_G = torch.optim.Adam(generator.parameters(), lr=args.lr, 
+                                   betas=(args.b1, args.b2))
+    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=args.lr, 
+                                   betas=(args.b1, args.b2))
     
     Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
     
     # Training
-    for epoch in range(opt.n_epochs):
+    for epoch in range(args.n_epochs):
         for i, (imgs, flux) in enumerate(dataloader):
             #print(i, imgs.shape)
             # Adversarial ground truths
@@ -192,7 +196,7 @@ def main():
             optimizer_G.zero_grad()
     
             # Sample noise as generator input
-            #z = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], opt.latent_dim))))
+            #z = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.latent_dim))))
             z = Variable(Tensor(flux))
     
             # Generate a batch of images
@@ -218,9 +222,9 @@ def main():
     
             print(
                 "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
-                % (epoch, opt.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
+                % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
             )
     
             batches_done = epoch * len(dataloader) + i
-            if batches_done % opt.sample_interval == 0:
+            if batches_done % args.sample_interval == 0:
                 save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
