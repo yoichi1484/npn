@@ -1,4 +1,4 @@
-NeuPlaNet dataset
+NeuPlaNet dataset / GAN
 ===
 
 # Dataset
