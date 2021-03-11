@@ -3,6 +3,7 @@ import os
 import numpy as np
 import math
 import json
+from tqdm import tqdm
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
@@ -182,6 +183,7 @@ def main():
     Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
     
     # Training
+    training_loop = tqdm(range(1, args.n_epochs + 1))
     for epoch in range(args.n_epochs):
         for i, (imgs, flux) in enumerate(dataloader):
             #print(i, imgs.shape)
@@ -221,10 +223,11 @@ def main():
             d_loss.backward()
             optimizer_D.step()
     
-            print(
-                "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
-                % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
-            )
+            #print(
+            #    "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
+            #    % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
+            #)
+            training_loop.set_description("Epoch %d | G Loss: %f | D Loss: %f" % (epoch, g_loss.item(), d_loss.item()))
     
         # Make a directory for logging
         os.makedirs(args.log_dir, exist_ok=True)
