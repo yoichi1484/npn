@@ -55,6 +55,7 @@ np.random.seed(12)
 starry.config.lazy = False
 starry.config.quiet = True
 
+npts = 1000
 time = np.linspace(0, 1, npts)
 fig, ax = plt.subplots(1, figsize=(12, 4))
 ax.plot(time, flux)
