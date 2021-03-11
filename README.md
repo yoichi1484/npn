@@ -7,7 +7,7 @@ data
   ├── n10000_64x32_bin.zip # zip file of map images
   └── flux1 
         ├── flux.npy       # light curve
-        └── configs.json   # computation configs of light curves
+        └── configs.json   # configs of computation of light curves
 ```
 
 # Setup
