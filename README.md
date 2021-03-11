@@ -31,7 +31,7 @@ $ python src/dcgan.py \
 Compute the flux from an image
 ```python
 from src.utils import get_light_curve
-flux = get_light_curve("n10000_64x32_bin/map_0294.png", 
+flux = get_light_curve("n10000_64x32_bin/map_00294.png", 
                         ydeg = 10, 
                         amp = 1.3, 
                         obl = 23.5, 
