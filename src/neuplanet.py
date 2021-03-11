@@ -8,13 +8,14 @@ from PIL import Image
 
 
 class NeuPlaNet(Dataset):
-    def __init__(self, root_dir, fluxes, n_data, img_size, transform=None):
+    def __init__(self, root_dir, fluxes, n_data, img_size, transform=None, preprocessing=None):
         # 画像ファイルのパス一覧を取得する。
         self.root_dir = root_dir
         self.filenames = sorted(glob("{}/*.png".format(self.root_dir)))[:n_data]
         self.fluxes = fluxes[:n_data]
         self.img_size = img_size
         self.transform = transform
+        self.preprocessing = preprocessing
 
     def __getitem__(self, index: int):
         """
@@ -35,6 +36,9 @@ class NeuPlaNet(Dataset):
 
         if self.transform is not None:
             img = self.transform(img)
+
+        if self.preprocessing is not None:
+            flux = self.preprocessing(flux)
 
         return img, flux
 
