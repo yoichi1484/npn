@@ -31,11 +31,11 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, args):
+    def __init__(self, latent_dim, channels):
         super(Generator, self).__init__()
 
         self.init_size = args.img_size // 4
-        self.l1 = nn.Sequential(nn.Linear(args.latent_dim, 128 * self.init_size ** 2))
+        self.l1 = nn.Sequential(nn.Linear(latent_dim, 128 * self.init_size ** 2))
 
         self.conv_blocks = nn.Sequential(
             nn.BatchNorm2d(128),
@@ -47,7 +47,7 @@ class Generator(nn.Module):
             nn.Conv2d(128, 64, 3, stride=1, padding=1),
             nn.BatchNorm2d(64, 0.8),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(64, args.channels, 3, stride=1, padding=1),
+            nn.Conv2d(64, channels, 3, stride=1, padding=1),
             nn.Tanh(),
         )
 
@@ -59,7 +59,7 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, args):
+    def __init__(self, img_size, channels):
         #self.i = 0
         super(Discriminator, self).__init__()
 
@@ -70,14 +70,14 @@ class Discriminator(nn.Module):
             return block
 
         self.model = nn.Sequential(
-            *discriminator_block(args.channels, 16, bn=False),
+            *discriminator_block(channels, 16, bn=False),
             *discriminator_block(16, 32),
             *discriminator_block(32, 64),
             *discriminator_block(64, 128),
         )
 
         # The height and width of downsampled image
-        ds_size = args.img_size // 2 ** 4
+        ds_size = img_size // 2 ** 4
         self.adv_layer = nn.Sequential(nn.Linear(128 * ds_size ** 2, 1), nn.Sigmoid())
 
     def forward(self, img):
@@ -167,8 +167,8 @@ def main():
     print(json.dumps(args.__dict__, indent=2))
     
     # Initialize generator and discriminator
-    generator = Generator(args)
-    discriminator = Discriminator(args)
+    generator = Generator(args.latent_dim, args.channels)
+    discriminator = Discriminator(args.img_size, args.channels)
     
     if use_cuda:
         generator.cuda()
