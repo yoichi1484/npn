@@ -46,3 +46,23 @@ def get_device(gpu_id=-1):
     else:
         print('device: cpu')
         return torch.device("cpu"), False
+
+
+class Normalize():
+    def __init__(self, fluxes):
+        self.mean = np.mean(fluxes, axis=0)
+        self.std = np.std(fluxes, axis=0)
+
+    def __call__(self, flux):
+        return np.abs(self.mean - flux) / self.std
+
+
+
+
+
+
+
+
+
+
+
