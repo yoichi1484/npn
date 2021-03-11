@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 import starry
 
 np.random.seed(12)
@@ -36,3 +37,12 @@ def get_light_curve(path_img, ydeg, amp, obl, inc, npts, nrot, sigma=0.005):
     flux = flux0 + sigma * np.random.randn(npts)
 
     return flux, map
+
+
+def get_device(gpu_id=-1):
+    if gpu_id >= 0 and torch.cuda.is_available():
+        print('device: gpu')
+        return torch.device("cuda", gpu_id), True
+    else:
+        print('device: cpu')
+        return torch.device("cpu"), False
