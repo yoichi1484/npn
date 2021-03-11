@@ -31,10 +31,10 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, latent_dim, channels):
+    def __init__(self, latent_dim, img_size, channels):
         super(Generator, self).__init__()
 
-        self.init_size = args.img_size // 4
+        self.init_size = img_size // 4
         self.l1 = nn.Sequential(nn.Linear(latent_dim, 128 * self.init_size ** 2))
 
         self.conv_blocks = nn.Sequential(
@@ -167,7 +167,7 @@ def main():
     print(json.dumps(args.__dict__, indent=2))
     
     # Initialize generator and discriminator
-    generator = Generator(args.latent_dim, args.channels)
+    generator = Generator(args.latent_dim, args.img_size, args.channels)
     discriminator = Discriminator(args.img_size, args.channels)
     
     if use_cuda:
