@@ -99,16 +99,17 @@ def _parse():
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
     parser.add_argument("--dry_run", action='store_true', help="quickly check a single pass")
     parser.add_argument("--gpu_id", type=int, default=-1, help="gpu device id. (cpu = -1)")
-    parser.add_argument("--sample_interval", type=int, default=400, help="interval between image sampling")
+    parser.add_argument("--log_interval", type=int, default=400, help="interval between image sampling")
     return parser.parse_args()
 
 def main():
+    # Setup arguments
     args = _parse()
-
-    os.makedirs("images", exist_ok=True)
     if args.dry_run:
         n_data = 1
         args.n_epochs = 1
+    now = str(datetime.datetime.today()).replace(' ', '_').replace(':', '-').replace('.', '_')
+    args.log_dir = now
 
     #cuda = True if torch.cuda.is_available() else False
     device, use_cuda = utils.get_device(args.gpu_id)
@@ -225,6 +226,11 @@ def main():
                 % (epoch, args.n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
             )
     
-            batches_done = epoch * len(dataloader) + i
-            if batches_done % args.sample_interval == 0:
-                save_image(gen_imgs.data[:25], "images/%d.png" % batches_done, nrow=5, normalize=True)
+        # Make a directory for logging
+        os.makedirs(args.log_dir, exist_ok=True)
+        os.makedirs(args.log_dir + "/images", exist_ok=True)
+        
+        # Logging training status
+        if epoch % args.log_interval == 0:
+            torch.save(generator.state_dict(), "{}/generator.pt".format(args.log_dir))
+            save_image(gen_imgs.data[:25], "{}/images/{}.png".format(args.log_dir, epoch), nrow=5, normalize=True)
