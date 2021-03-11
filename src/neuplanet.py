@@ -27,7 +27,7 @@ class NeuPlaNet(Dataset):
         # pngなので、jpgのRGBにしてからLで二値化
         img = Image.open(self.filenames[index]).convert('RGB').convert('L')  #os.path.join(self.root_dir, self.filenames[index]))
         img = img.resize((self.img_size, self.img_size))
-        flux = fluxes[index]
+        flux = self.fluxes[index]
 
         # doing this so that it is consistent with all other datasets
         # to return a PIL Image
