@@ -140,6 +140,9 @@ def main():
     # Load flux data
     fluxes = np.load(args.path_lc + "/flux.npy")
 
+    # Setup preprocessing function
+    preprocessing = utils.Normalize(fluxes)
+
     # Configure data loader
     transform = transforms.Compose(
                 [transforms.Resize(args.img_size), transforms.ToTensor(), 
@@ -151,7 +154,8 @@ def main():
         fluxes = fluxes, 
         n_data = n_data, 
         img_size = args.img_size, 
-        transform=transform)
+        transform = transform, 
+        preprocessing = preprocessing)
     
     dataloader = torch.utils.data.DataLoader(
         dataset,
@@ -186,7 +190,7 @@ def main():
                                    betas=(args.b1, args.b2))
     
     Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
-    
+
     # Training
     training_loop = tqdm(range(1, args.n_epochs + 1))
     for epoch in range(args.n_epochs):
