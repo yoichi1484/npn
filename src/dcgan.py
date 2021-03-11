@@ -1,8 +1,9 @@
 import argparse
 import os
-import numpy as np
 import math
 import json
+import datetime
+import numpy as np
 from tqdm import tqdm
 
 import torchvision.transforms as transforms
@@ -89,6 +90,8 @@ class Discriminator(nn.Module):
 def _parse():
     parser = argparse.ArgumentParser()
     parser.add_argument("--path_lc", type=str, required=True, help="path of light curve data")
+    parser.add_argument("--path_img", type=str, required=True, help="path of map images")
+    parser.add_argument("--path_log", type=str, default=".", help="path for logging model")
     parser.add_argument("--n_epochs", type=int, default=200, help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=512, help="size of the batches")
     parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
@@ -100,7 +103,7 @@ def _parse():
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
     parser.add_argument("--dry_run", action='store_true', help="quickly check a single pass")
     parser.add_argument("--gpu_id", type=int, default=-1, help="gpu device id. (cpu = -1)")
-    parser.add_argument("--log_interval", type=int, default=400, help="interval between image sampling")
+    parser.add_argument("--log_interval", type=int, default=100, help="interval between image sampling")
     return parser.parse_args()
 
 def main():
@@ -109,8 +112,10 @@ def main():
     if args.dry_run:
         n_data = 1
         args.n_epochs = 1
+    else:
+        n_data = -1
     now = str(datetime.datetime.today()).replace(' ', '_').replace(':', '-').replace('.', '_')
-    args.log_dir = now
+    args.log_dir = args.path_log + "/" + now
 
     #cuda = True if torch.cuda.is_available() else False
     device, use_cuda = utils.get_device(args.gpu_id)
@@ -133,7 +138,7 @@ def main():
     """
     
     # Load flux data
-    fluxes = np.load(args.path_lc)
+    fluxes = np.load(args.path_lc + "/flux.npy")
 
     # Configure data loader
     transform = transforms.Compose(
@@ -142,7 +147,7 @@ def main():
                 )
         
     dataset = NeuPlaNet(
-        path_dataset, 
+        args.path_img, 
         fluxes = fluxes, 
         n_data = n_data, 
         img_size = args.img_size, 
@@ -200,7 +205,7 @@ def main():
     
             # Sample noise as generator input
             #z = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.latent_dim))))
-            z = Variable(Tensor(flux))
+            z = Variable(flux.type(Tensor))
     
             # Generate a batch of images
             gen_imgs = generator(z)
@@ -237,3 +242,7 @@ def main():
         if epoch % args.log_interval == 0:
             torch.save(generator.state_dict(), "{}/generator.pt".format(args.log_dir))
             save_image(gen_imgs.data[:25], "{}/images/{}.png".format(args.log_dir, epoch), nrow=5, normalize=True)
+
+
+if __name__ == '__main__':
+    main()
