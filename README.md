@@ -28,6 +28,11 @@ $ python src/dcgan.py \
   --n_epochs 20000 \
 ```
 
+Make flux dataset from images
+```
+$ python src/make_dataset.py --npts 1000 --path_save data/myflux
+```
+
 Compute the flux from an image
 ```python
 from src.utils import get_light_curve
