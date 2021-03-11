@@ -28,6 +28,7 @@ parser.add_argument('--ydeg', type=int, default=10)
 parser.add_argument('--amp', type=int, default=1.3)
 parser.add_argument('--obl', type=int, default=23.5)
 parser.add_argument('--inc', type=int, default=60)
+parser.add_argument('--n_data', type=int, default=-1)
 parser.add_argument('--npts', type=int, default=10000)
 parser.add_argument('--nrot', type=int, default=10)
 parser.add_argument('--dry-run', action='store_true', default=False,
@@ -38,7 +39,7 @@ print(json.dumps(args.__dict__, indent=2))
 if args.dry_run:
   n_data = 1
 else:
-  n_data = -1 # use all images
+  n_data = args.n_data #-1 # use all images
   
 print("computing flux")
 fluxes = make_dataset(args.path_img, n_data, args.ydeg, args.amp, 
