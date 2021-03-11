@@ -4,10 +4,7 @@ import math
 import json
 import datetime
 import numpy as np
-try:
-    from tqdm.notebook import tqdm
-except:
-    from tqdm import tqdm
+from tqdm import tqdm
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
