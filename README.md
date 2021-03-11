@@ -18,7 +18,7 @@ $ zip n10000_64x32_bin.zip
 
 # Usage
 Training DCGAN
-```python
+```
 $ python src/dcgan.py \
   --path_lc data/flux1 \
   --path_img data/n10000_64x32_bin \
