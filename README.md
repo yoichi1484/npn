@@ -27,3 +27,32 @@ $ python src/dcgan.py \
   --batch_size 16 \
   --n_epochs 20000 \
 ```
+
+Compute the flux from an image
+```python
+from src.utils import get_light_curve
+flux = get_light_curve("n10000_64x32_bin/map_0294.png", 
+                        ydeg = 10, 
+                        amp = 1.3, 
+                        obl = 23.5, 
+                        inc = 60, 
+                        npts = 1000, 
+                        nrot = 10)
+```
+
+Plot a light curve
+```python
+from numpy as np
+import matplotlib.pyplot as plt
+import starry
+
+np.random.seed(12)
+starry.config.lazy = False
+starry.config.quiet = True
+
+time = np.linspace(0, 1, npts)
+fig, ax = plt.subplots(1, figsize=(12, 4))
+ax.plot(time, flux)
+ax.set_xlabel("orbital phase", fontsize=18)
+ax.set_ylabel("flux", fontsize=18);
+```
