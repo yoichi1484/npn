@@ -16,6 +16,7 @@ import torch.nn.functional as F
 import torch
 
 from neuplanet import NeuPlaNet
+import utils
 
 
 def weights_init_normal(m):
@@ -108,7 +109,8 @@ def main():
         n_data = 1
         opt.n_epochs = 1
 
-    cuda = True if torch.cuda.is_available() else False
+    #cuda = True if torch.cuda.is_available() else False
+    device, use_cuda = utils.get_device(opt.gpu_id)
 
     """
     # Configure data loader
@@ -159,7 +161,7 @@ def main():
     generator = Generator(opt)
     discriminator = Discriminator(opt)
     
-    if cuda:
+    if use_cuda:
         generator.cuda()
         discriminator.cuda()
         adversarial_loss.cuda()
@@ -172,7 +174,7 @@ def main():
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lr, betas=(opt.b1, opt.b2))
     
-    Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
     
     # Training
     for epoch in range(opt.n_epochs):
