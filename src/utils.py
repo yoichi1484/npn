@@ -57,6 +57,58 @@ class Normalize():
         return np.abs(self.mean - flux) / self.std
 
 
+class NeuPlaNetGenerator():
+    def __init__(self, model_path, lc_path, model):
+        with open("{}/configs.json".format(lc_path)) as f:
+            self.cfg = json.load(f)
+        self.generator = model.Generator(latent_dim=100, img_size=64, channels=1)
+        self.device, use_cuda = get_device(-1)
+        self.generator.load_state_dict(torch.load(model_path, map_location=device))
+        #self.Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
+        #with open("drive/MyDrive/neuplanet/data/flux1/configs.json") as f:
+
+
+    def generate_maps(self, fluxes):
+        z = torch.from_numpy(fluxes).float().to(self.device)
+        with torch.no_grad():
+            maps = self.generator(z)
+        save_image(maps.data, "tmp_img.png", nrow=5, normalize=True)
+
+    def compare_maps(self, filename, flux=None):
+        # compute flux
+        
+        #if fluxes is None:
+        #    fluxes = []
+        #    for path_imgm in zip(filenames):
+        #        flux = utils.get_light_curve(path_img, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+        #                                self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
+        #        fluxes.append(flux)
+        #    fluxes = np.array(fluxes)
+        if flux is None:
+            flux = utils.get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+                                        self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
+        flux = np.reshape(flux, (1, len(flux)))
+
+        # generate maps
+        print("generated")
+        self.generate_maps(flux)
+        im = Image.open("tmp_img.png", "r")
+        im = im.resize((im.size[0]*2, im.size[1]))
+        plt.imshow(np.array(im))
+        plt.show()
+
+        # real maps
+        print("real")
+        im = Image.open(filename)#.convert('RGB').convert('L') 
+        plt.imshow(np.array(im))
+        plt.show()
+
+
+
+
+
+
+
 
 
 
