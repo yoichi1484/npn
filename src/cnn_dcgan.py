@@ -31,15 +31,15 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, latent_dim, img_size, channels):
+    def __init__(self, n_pts, img_size, channels, latent_dim):
         super(Generator, self).__init__()
         
         self.n_wave = 1 # 違う帯域で観測した波の数をチャンネルとする。その場合はfluxにチャンネルが入るような形でデータを作り直す必要あり
-        self.n_pts = 1000
+        self.n_pts = n_pts
 
         # CNN で光度曲線の特徴抽出
         self.conv = nn.Sequential(
-            nn.Conv1d(n_wave, 8, 10),
+            nn.Conv1d(self.n_wave, 8, 10),
             nn.LeakyReLU(0.2, inplace=True),
             nn.MaxPool1d(5, stride=2),
             nn.Conv1d(8, 16, 10),
