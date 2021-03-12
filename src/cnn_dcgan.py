@@ -31,11 +31,11 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, n_pts, img_size, channels, latent_dim):
+    def __init__(self, npts, img_size, channels, latent_dim):
         super(Generator, self).__init__()
         
         self.n_wave = 1 # 違う帯域で観測した波の数をチャンネルとする。その場合はfluxにチャンネルが入るような形でデータを作り直す必要あり
-        self.n_pts = n_pts
+        self.npts = npts
 
         # CNN で光度曲線の特徴抽出
         self.conv = nn.Sequential(
@@ -73,7 +73,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, z):
-        z = out.view(z.shape[0], self.n_wave, self.n_pts)
+        z = out.view(z.shape[0], self.n_wave, self.npts)
         z = self.conv(z)
         out = self.l1(z)
         out = out.view(out.shape[0], 128, self.init_size, self.init_size)
@@ -173,11 +173,12 @@ def main():
     adversarial_loss = torch.nn.BCELoss()
     
     # Show configs
-    args.latent_dim = fluxes.shape[1]
+    args.latent_dim = 100
+    args.npts = fluxes.shape[1]
     print(json.dumps(args.__dict__, indent=2))
     
     # Initialize generator and discriminator
-    generator = Generator(args.latent_dim, args.img_size, args.channels)
+    generator = Generator(args.npts, args.img_size, args.channels, args.latent_dim)
     discriminator = Discriminator(args.img_size, args.channels)
     
     if use_cuda:
