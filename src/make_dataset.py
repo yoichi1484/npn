@@ -34,12 +34,26 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[
         i += 1
     return np.array(light_curves)
 
+
 def save(fluxes, args):
     os.makedirs(args.path_save, exist_ok=True)
     with open('{}/configs.json'.format(args.path_save), 'w') as f:
         json.dump(args.__dict__, f)
     np.save(args.path_save + "/flux", fluxes)
 
+    
+def check_config(args):
+    with open('{}/configs.json'.format(args.path_save)) as f:
+        loaded_configs = json.load(f)
+    assert loaded_configs["ydeg"] == args.ydeg
+    assert loaded_configs["amp"] == args.amp
+    assert loaded_configs["obl"] == args.obl
+    assert loaded_configs["inc"] == args.inc
+    assert loaded_configs["npts"] == args.npts
+    assert loaded_configs["nrot"] == args.nrot
+    assert loaded_configs["path_img"] == args.path_img
+    
+    
 parser = argparse.ArgumentParser(description='A script of making NeuPlaNet dataset')
 parser.add_argument('--path_img', type=str, default="n10000_64x32_bin")
 parser.add_argument('--path_save', type=str, default="flux")
@@ -50,7 +64,7 @@ parser.add_argument('--inc', type=int, default=60)
 parser.add_argument('--n_data', type=int, default=-1)
 parser.add_argument('--npts', type=int, default=10000)
 parser.add_argument('--nrot', type=int, default=10)
-parser.add_argument('--no_overwrite', action='store_true', default=False,
+parser.add_argument('--load_flux', action='store_true', default=False,
                     help='flag that does not overwrite flux data')
 parser.add_argument('--dry-run', action='store_true', default=False,
                     help='quickly check a single pass')
@@ -63,10 +77,12 @@ else:
   n_data = args.n_data #-1 # use all images
 
 path = args.path_save + "/flux.npy"
-if os.path.exists(path):
+if os.path.exists(path) and args.load_flux:
+    check_config(args)
     fluxes = np.load(path)
 else:
     fluxes = []
+
   
 print("computing flux")
 fluxes = make_dataset(args.path_img, n_data, args.ydeg, args.amp, 
