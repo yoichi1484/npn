@@ -21,7 +21,7 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[
     assert len(files) != 0
     
     if fluxes!=[]:
-        light_curves = flux.tolist()
+        light_curves = fluxes.tolist()
     else:
         light_curves = []
     
