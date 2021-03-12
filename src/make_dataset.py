@@ -9,12 +9,22 @@ import numpy as np
 import utils
 
 
-def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, log_interval=100, args=None):
+def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[], log_interval=100, args=None):
     files = sorted(glob("{}/*.png".format(path_dataset)))
+    idx = len(fluxes)
     if n_data > 0:
-      files = files[:n_data]
+        files = files[idx:n_data]
+    else:
+        files = files[idx:]
+        print("computing flux from [] (index: {})".format(files[idx], idx))
+    
     assert len(files) != 0
-    light_curves = []
+    
+    if fluxes!=[]:
+        light_curves = flux.tolist()
+    else:
+        light_curves = []
+    
     i = 0
     for filename in tqdm(files): #tqdm(enumerate(files)):
         flux, _ = utils.get_light_curve(filename, ydeg, amp, obl, inc, npts, nrot)
@@ -49,10 +59,14 @@ if args.dry_run:
   n_data = 1
 else:
   n_data = args.n_data #-1 # use all images
+
+path = args.path_save + "/flux"
+is os.path.exists(path):
+    fluxes = np.load(path)
   
 print("computing flux")
 fluxes = make_dataset(args.path_img, n_data, args.ydeg, args.amp, 
-                      args.obl, args.inc, args.npts, args.nrot, args=args)
+                      args.obl, args.inc, args.npts, args.nrot, fluxes=fluxes, args=args)
 
 print("saving...")
 save(fluxes, args)
