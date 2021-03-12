@@ -13,8 +13,6 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[
     files = sorted(glob("{}/*.png".format(path_dataset)))
     idx = len(fluxes)
     if n_data > 0:
-        print(len(files), idx, idx+n_data)
-        assert False
         files = files[idx:idx+n_data]
     else:
         files = files[idx:]
