@@ -102,6 +102,7 @@ def _parse():
     parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
     parser.add_argument("--dry_run", action='store_true', help="quickly check a single pass")
+    parser.add_argument("--no_flux", action='store_true', help="use the random vector instead of flux")
     parser.add_argument("--gpu_id", type=int, default=-1, help="gpu device id. (cpu = -1)")
     parser.add_argument("--log_interval", type=int, default=100, help="interval between image sampling")
     return parser.parse_args()
@@ -224,7 +225,11 @@ def main():
     
             ## Train with all-fake batch
             # Generate batch of latent vectors
-            noise = torch.randn(b_size, args.latent_dim, 1, 1, device=device)
+            #noise = torch.randn(b_size, args.latent_dim, 1, 1, device=device)
+            if args.no_flux:
+                noise = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.npts))))
+            else:
+                noise = Variable(flux.type(Tensor))
             # Generate fake image batch with G
             fake = generator(noise)
             label.fill_(fake_label)
