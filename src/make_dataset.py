@@ -16,7 +16,7 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[
         files = files[idx:n_data]
     else:
         files = files[idx:]
-        print("computing flux from [] (index: {})".format(files[idx], idx))
+        print("computing flux from [{}] (index: {})".format(files[idx], idx))
     
     assert len(files) != 0
     
@@ -80,6 +80,7 @@ path = args.path_save + "/flux.npy"
 if os.path.exists(path) and args.load_flux:
     check_config(args)
     fluxes = np.load(path)
+    print("loaded flux <- {}".format(path))
 else:
     fluxes = []
 
