@@ -34,15 +34,25 @@ class Generator(nn.Module):
     def __init__(self, latent_dim, img_size, channels):
         super(Generator, self).__init__()
         
-        self.n_wave = 1
+        self.n_wave = 1 # 違う帯域で観測した波の数をチャンネルとする。その場合はfluxにチャンネルが入るような形でデータを作り直す必要あり
         self.n_pts = 1000
 
         # CNN で光度曲線の特徴抽出
         self.conv = nn.Sequential(
-            nn.Conv1d(self.n_wave, 16, 10), #nn.Conv1d(in_channels, out_channels, kernel_size)
+            nn.Conv1d(n_wave, 8, 10),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.MaxPool1d(10, stride=2),
-            nn.Conv1d(, 16, 10), 
+            nn.MaxPool1d(5, stride=2),
+            nn.Conv1d(8, 16, 10),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.MaxPool1d(5, stride=2),
+            nn.Conv1d(16, 32, 10),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.MaxPool1d(5, stride=2),
+            nn.Linear(32 * 114, 1000),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(1000, 300),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(300, latent_dim),
         )
         
         self.init_size = img_size // 4
@@ -63,8 +73,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, z):
-        # n_wave は違う帯域で観測した波の数
-        z = out.view(z.shape[0], self.n_wave, 1, self.n_pts)
+        z = out.view(z.shape[0], self.n_wave, self.n_pts)
         z = self.conv(z)
         out = self.l1(z)
         out = out.view(out.shape[0], 128, self.init_size, self.init_size)
