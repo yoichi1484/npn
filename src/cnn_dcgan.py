@@ -209,49 +209,74 @@ def main():
 
     # Training
     training_loop = tqdm(range(1, args.n_epochs + 1))
+    
+    # ここから変更
+    # Create batch of latent vectors that we will use to visualize
+    #  the progression of the generator
+    #fixed_noise = torch.randn(64, args.latent_dim, 1, 1, device=device)
+    
+    # Establish convention for real and fake labels during training
+    real_label = 1.
+    fake_label = 0.
+    
     for epoch in range(args.n_epochs):
         for i, (imgs, flux) in enumerate(dataloader):
-            #print(i, imgs.shape)
-            # Adversarial ground truths
-            valid = Variable(Tensor(imgs.shape[0], 1).fill_(1.0), requires_grad=False)
-            fake = Variable(Tensor(imgs.shape[0], 1).fill_(0.0), requires_grad=False)
+            ############################
+            # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
+            ###########################
+            ## Train with all-real batch
+            discriminator.zero_grad()
+            # Format batch
+            real_cpu = imgs.to(device)
+            b_size = real_cpu.size(0)
+            label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
+            # Forward pass real batch through D
+            output = discriminator(real_cpu).view(-1)
+            # Calculate loss on all-real batch
+            errD_real = adversarial_loss(output, label)
+            # Calculate gradients for D in backward pass
+            errD_real.backward()
+            D_x = output.mean().item()
     
-            # Configure input
-            real_imgs = Variable(imgs.type(Tensor))
-            #print(real_imgs.shape)
-    
-            # Train Generator
-            optimizer_G.zero_grad()
-    
-            # Sample noise as generator input
+            ## Train with all-fake batch
+            # Generate batch of latent vectors
+            #noise = torch.randn(b_size, args.latent_dim, 1, 1, device=device)
             if args.no_flux:
-                z = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.npts))))
+                noise = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.latent_dim))))
             else:
-                z = Variable(flux.type(Tensor))
-    
-            # Generate a batch of images
-            gen_imgs = generator(z)
-            #print(gen_imgs.shape)
-    
-            # Loss measures generator's ability to fool the discriminator
-            g_loss = adversarial_loss(discriminator(gen_imgs), valid)
-    
-            g_loss.backward()
-            optimizer_G.step()
-    
-            # Train Discriminator
-            optimizer_D.zero_grad()
-    
-            # Measure discriminator's ability to classify real from generated samples
-            real_loss = adversarial_loss(discriminator(real_imgs), valid)
-            fake_loss = adversarial_loss(discriminator(gen_imgs.detach()), fake)
-            d_loss = (real_loss + fake_loss) / 2
-    
-            d_loss.backward()
+                noise = Variable(flux.type(Tensor))
+            # Generate fake image batch with G
+            fake = generator(noise)
+            label.fill_(fake_label)
+            # Classify all fake batch with D
+            output = discriminator(fake.detach()).view(-1)
+            # Calculate D's loss on the all-fake batch
+            errD_fake = adversarial_loss(output, label)
+            # Calculate the gradients for this batch
+            errD_fake.backward()
+            D_G_z1 = output.mean().item()
+            # Add the gradients from the all-real and all-fake batches
+            errD = errD_real + errD_fake
+            # Update D
             optimizer_D.step()
     
+            ############################
+            # (2) Update G network: maximize log(D(G(z)))
+            ###########################
+            generator.zero_grad()
+            label.fill_(real_label)  # fake labels are real for generator cost
+            # Since we just updated D, perform another forward pass of all-fake batch through D
+            output = discriminator(fake).view(-1)
+            # Calculate G's loss based on this output
+            errG = adversarial_loss(output, label)
+            # Calculate gradients for G
+            errG.backward()
+            D_G_z2 = output.mean().item()
+            # Update G
+            optimizer_G.step()    
+            
             n_iter = epoch * len(dataloader) + i
-            training_loop.set_description("Epoch %d | Iter %d | G Loss: %f | D Loss: %f" % (epoch, n_iter, g_loss.item(), d_loss.item()))
+            training_loop.set_description("Epoch %d | Iter %d | G Loss: %f | D Loss: %f" % (epoch, n_iter, errG.item(), errD.item()))
     
         # Make a directory for logging
         os.makedirs(args.log_dir, exist_ok=True)
@@ -260,7 +285,7 @@ def main():
         # Logging training status
         if epoch % args.log_interval == 0:
             torch.save(generator.state_dict(), "{}/generator.pt".format(args.log_dir))
-            save_image(gen_imgs.data[:25], "{}/images/{}.png".format(args.log_dir, epoch), nrow=5, normalize=True)
+            save_image(fake.data[:25], "{}/images/{}.png".format(args.log_dir, epoch), nrow=5, normalize=True)
 
 
 if __name__ == '__main__':
