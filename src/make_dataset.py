@@ -61,7 +61,7 @@ else:
   n_data = args.n_data #-1 # use all images
 
 path = args.path_save + "/flux"
-is os.path.exists(path):
+if os.path.exists(path):
     fluxes = np.load(path)
   
 print("computing flux")
@@ -71,3 +71,10 @@ fluxes = make_dataset(args.path_img, n_data, args.ydeg, args.amp,
 print("saving...")
 save(fluxes, args)
 print("done.")
+
+
+
+
+
+
+
