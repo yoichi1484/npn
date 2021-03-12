@@ -131,7 +131,6 @@ def main():
     
     if use_cuda:
         generator.cuda()
-        discriminator.cuda()
         #adversarial_loss.cuda()
         mse_loss.cuda()
         
