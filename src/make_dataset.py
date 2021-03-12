@@ -16,6 +16,7 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[
         files = files[idx:idx+n_data]
     else:
         files = files[idx:]
+    print(files[idx])
     print("computing flux from [{}] (index: {})".format(files[idx], idx))
     
     assert len(files) != 0
