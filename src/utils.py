@@ -1,6 +1,8 @@
 import numpy as np
+import json
 import torch
 import starry
+
 
 np.random.seed(12)
 starry.config.lazy = False
@@ -102,19 +104,5 @@ class NeuPlaNetGenerator():
         im = Image.open(filename)#.convert('RGB').convert('L') 
         plt.imshow(np.array(im))
         plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
