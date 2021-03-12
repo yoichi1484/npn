@@ -73,6 +73,8 @@ class Generator(nn.Module):
         )
 
     def forward(self, z):
+        print(z.shape)
+        assert False
         z = z.view(z.shape[0], self.n_wave, self.npts)
         z = self.conv(z)
         out = self.l1(z)
