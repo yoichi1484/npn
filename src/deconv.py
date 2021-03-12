@@ -157,6 +157,7 @@ def main():
             fake = generator(noise)
             
             # Compute loss
+            imgs = imgs.to(device)
             err = mse_loss(fake, imgs)
             
             # Zero the gradients before running the backward pass
