@@ -48,15 +48,21 @@ class Generator(nn.Module):
             nn.Conv1d(16, 32, 10),
             nn.LeakyReLU(0.2, inplace=True),
             nn.MaxPool1d(5, stride=2),
-            nn.Linear(32 * 114, 1000),
+        )
+        
+        self.init_size = img_size // 4
+        self.l0 =  nn.Sequential(
+            #nn.Linear(32 * 114, 1000), # npts = 1000 のとき
+            nn.Linear(32 * 2, 1000), # npts = 100 のとき
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(1000, 300),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(300, latent_dim),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(latent_dim, 128 * self.init_size ** 2)
         )
-        
-        self.init_size = img_size // 4
-        self.l1 = nn.Sequential(nn.Linear(latent_dim, 128 * self.init_size ** 2))
+       
+        #self.l1 = nn.Sequential(nn.Linear(latent_dim, 128 * self.init_size ** 2))
 
         self.deconv = nn.Sequential(
             nn.BatchNorm2d(128),
@@ -73,11 +79,11 @@ class Generator(nn.Module):
         )
 
     def forward(self, z):
-        print(z.shape)
-        assert False
         z = z.view(z.shape[0], self.n_wave, self.npts)
         z = self.conv(z)
-        out = self.l1(z)
+        z = z.view(z.shape[0], -1)
+        out = self.l0(z)
+        #out = self.l1(z)
         out = out.view(out.shape[0], 128, self.init_size, self.init_size)
         img = self.deconv(out)
         return img
