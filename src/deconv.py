@@ -125,6 +125,10 @@ def main():
     # Show configs
     args.latent_dim = fluxes.shape[1]
     print(json.dumps(args.__dict__, indent=2))
+    
+    # Make a directory for logging
+    os.makedirs(args.log_dir, exist_ok=True)
+    os.makedirs(args.log_dir + "/images", exist_ok=True)
     with open('{}/args.json'.format(args.log_dir), 'w') as f:
         json.dump(args.__dict__, f)
     
@@ -173,10 +177,6 @@ def main():
             
             n_iter = epoch * len(dataloader) + i
             training_loop.set_description("Epoch %d | Iter %d | Loss: %f" % (epoch, n_iter, err.item()))
-    
-        # Make a directory for logging
-        os.makedirs(args.log_dir, exist_ok=True)
-        os.makedirs(args.log_dir + "/images", exist_ok=True)
         
         # Logging training status
         if epoch % args.log_interval == 0:
