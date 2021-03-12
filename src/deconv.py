@@ -125,6 +125,8 @@ def main():
     # Show configs
     args.latent_dim = fluxes.shape[1]
     print(json.dumps(args.__dict__, indent=2))
+    with open('{}/args.json'.format(args.log_dir), 'w') as f:
+        json.dump(args.__dict__, f)
     
     # Initialize generator 
     generator = Generator(args.latent_dim, args.img_size, args.channels)
