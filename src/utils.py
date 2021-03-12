@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import pprint
 import torch
 from torchvision.utils import save_image
 from PIL import Image
@@ -66,6 +67,7 @@ class NeuPlaNetGenerator():
     def __init__(self, path_model, model, path_lc=None, gpu=-1):
         with open("{}/args.json".format(path_model)) as f:
             self.args = json.load(f)
+        pprint.pprint(self.args, width=40)
         if path_lc is None:
             path_lc = self.args["path_lc"]
         with open("{}/configs.json".format(path_lc)) as f:
