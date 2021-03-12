@@ -13,10 +13,10 @@ def make_dataset(path_dataset, n_data, ydeg, amp, obl, inc, npts, nrot, fluxes=[
     files = sorted(glob("{}/*.png".format(path_dataset)))
     idx = len(fluxes)
     if n_data > 0:
-        files = files[idx:n_data]
+        files = files[idx:idx+n_data]
     else:
         files = files[idx:]
-        print("computing flux from [{}] (index: {})".format(files[idx], idx))
+    print("computing flux from [{}] (index: {})".format(files[idx], idx))
     
     assert len(files) != 0
     
