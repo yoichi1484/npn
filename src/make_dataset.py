@@ -60,9 +60,11 @@ if args.dry_run:
 else:
   n_data = args.n_data #-1 # use all images
 
-path = args.path_save + "/flux"
+path = args.path_save + "/flux.npy"
 if os.path.exists(path):
     fluxes = np.load(path)
+else:
+    fluxes = []
   
 print("computing flux")
 fluxes = make_dataset(args.path_img, n_data, args.ydeg, args.amp, 
