@@ -212,7 +212,7 @@ def main():
             ## Train with all-real batch
             discriminator.zero_grad()
             # Format batch
-            real_cpu = img.to(device)
+            real_cpu = imgs.to(device)
             b_size = real_cpu.size(0)
             label = torch.full((b_size,), real_label, dtype=torch.float, device=device)
             # Forward pass real batch through D
@@ -270,7 +270,7 @@ def main():
         # Logging training status
         if epoch % args.log_interval == 0:
             torch.save(generator.state_dict(), "{}/generator.pt".format(args.log_dir))
-            save_image(gen_imgs.data[:25], "{}/images/{}.png".format(args.log_dir, epoch), nrow=5, normalize=True)
+            save_image(fake.data[:25], "{}/images/{}.png".format(args.log_dir, epoch), nrow=5, normalize=True)
 
 
 if __name__ == '__main__':
