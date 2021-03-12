@@ -227,7 +227,7 @@ def main():
             # Generate batch of latent vectors
             #noise = torch.randn(b_size, args.latent_dim, 1, 1, device=device)
             if args.no_flux:
-                noise = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.npts))))
+                noise = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.latent_dim))))
             else:
                 noise = Variable(flux.type(Tensor))
             # Generate fake image batch with G
