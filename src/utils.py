@@ -67,7 +67,7 @@ class NeuPlaNetGenerator():
         with open("{}/args.json".format(path_model)) as f:
             self.args = json.load(f)
         if path_lc is None:
-            path_lc = args["path_lc"]
+            path_lc = self.args["path_lc"]
         with open("{}/configs.json".format(path_lc)) as f:
             self.cfg = json.load(f)
                 
