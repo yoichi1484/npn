@@ -65,7 +65,7 @@ class NeuPlaNetGenerator():
             self.cfg = json.load(f)
         self.generator = model.Generator(latent_dim=100, img_size=64, channels=1)
         self.device, use_cuda = get_device(-1)
-        self.generator.load_state_dict(torch.load(model_path, map_location=device))
+        self.generator.load_state_dict(torch.load(model_path, map_location=self.device))
         #self.Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
         #with open("drive/MyDrive/neuplanet/data/flux1/configs.json") as f:
 
