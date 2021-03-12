@@ -72,6 +72,7 @@ class NeuPlaNetGenerator():
             path_lc = self.args["path_lc"]
         with open("{}/configs.json".format(path_lc)) as f:
             self.cfg = json.load(f)
+        pprint.pprint(self.cfg, width=40)
                 
         self.generator = model.Generator(latent_dim=self.args["latent_dim"], img_size=self.args["img_size"], 
                                          channels=self.args["channels"])
