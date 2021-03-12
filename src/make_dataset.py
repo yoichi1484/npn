@@ -50,6 +50,8 @@ parser.add_argument('--inc', type=int, default=60)
 parser.add_argument('--n_data', type=int, default=-1)
 parser.add_argument('--npts', type=int, default=10000)
 parser.add_argument('--nrot', type=int, default=10)
+parser.add_argument('--no_overwrite', action='store_true', default=False,
+                    help='flag that does not overwrite flux data')
 parser.add_argument('--dry-run', action='store_true', default=False,
                     help='quickly check a single pass')
 args = parser.parse_args()
