@@ -133,6 +133,7 @@ def _parse():
     parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=1, help="number of image channels")
     parser.add_argument("--dry_run", action='store_true', help="quickly check a single pass")
+    parser.add_argument("--no_flux", action='store_true', help="use the random vector instead of flux")
     parser.add_argument("--gpu_id", type=int, default=-1, help="gpu device id. (cpu = -1)")
     parser.add_argument("--log_interval", type=int, default=100, help="interval between image sampling")
     return parser.parse_args()
@@ -223,8 +224,10 @@ def main():
             optimizer_G.zero_grad()
     
             # Sample noise as generator input
-            #z = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.latent_dim))))
-            z = Variable(flux.type(Tensor))
+            if args.no_flux:
+                z = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.npts))))
+            else:
+                z = Variable(flux.type(Tensor))
     
             # Generate a batch of images
             gen_imgs = generator(z)
