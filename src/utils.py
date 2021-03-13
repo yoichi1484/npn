@@ -105,7 +105,7 @@ class NeuPlaNetGenerator():
         #        fluxes.append(flux)
         #    fluxes = np.array(fluxes)
         if flux is None:
-            flux = utils.get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+            flux, _ = get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
                                         self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
         flux = np.reshape(flux, (1, len(flux)))
 
@@ -125,7 +125,7 @@ class NeuPlaNetGenerator():
         
     def compare_flux(self, filename, flux_real=None):
         if flux_real is None:
-            flux_real, _ = utils.get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+            flux_real, _ = get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
                                         self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
         flux_real = np.reshape(flux_real, (1, len(flux_real)))
 
@@ -134,7 +134,7 @@ class NeuPlaNetGenerator():
         im = Image.open("tmp_img.png", "r")
         im = im.resize((im.size[0]*2, im.size[1]))
         im.save('tmp_img.png')
-        flux_fake, _ = utils.get_light_curve('tmp_img.png', self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+        flux_fake, _ = get_light_curve('tmp_img.png', self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
                                         self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
         
         fig, ax = plt.subplots(1, figsize=(12, 4))
