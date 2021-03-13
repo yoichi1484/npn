@@ -64,7 +64,7 @@ class Normalize():
 
 
 class NeuPlaNetGenerator():
-    def __init__(self, path_model, model, preprocessing, path_lc=None, gpu=-1):
+    def __init__(self, path_model, generator, preprocessing, path_lc=None, gpu=-1):
         with open("{}/args.json".format(path_model)) as f:
             self.args = json.load(f)
         
@@ -78,8 +78,7 @@ class NeuPlaNetGenerator():
         print("\nconfigs of computing the flux")
         pprint.pprint(self.cfg, width=40)
                 
-        self.generator = model.Generator(latent_dim=self.args["latent_dim"], img_size=self.args["img_size"], 
-                                         channels=self.args["channels"])
+        self.generator = generator
         self.device, use_cuda = get_device(gpu)
         self.generator.load_state_dict(torch.load(path_model + "/generator.pt", map_location=self.device))
         #self.Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
