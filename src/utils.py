@@ -127,7 +127,7 @@ class NeuPlaNetGenerator():
         if flux_real is None:
             flux_real, _ = utils.get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
                                         self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
-        flux_real, _ = np.reshape(flux_real, (1, len(flux_real)))
+        flux_real = np.reshape(flux_real, (1, len(flux_real)))
 
         # generate maps
         self.generate_maps(flux_real)
