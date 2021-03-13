@@ -127,10 +127,9 @@ class NeuPlaNetGenerator():
         if flux_real is None:
             flux_real, _ = get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
                                         self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
-        flux_real = np.reshape(flux_real, (1, len(flux_real)))
-
+            
         # generate maps
-        self.generate_maps(flux_real)
+        self.generate_maps(np.reshape(flux_real, (1, len(flux_real))))
         im = Image.open("tmp_img.png", "r")
         im = im.resize((im.size[0]*2, im.size[1]))
         im.save('tmp_img.png')
