@@ -92,6 +92,7 @@ class NeuPlaNetGenerator():
         with torch.no_grad():
             maps = self.generator(z)
         save_image(maps.data, "tmp_img.png", nrow=5, normalize=True)
+        return maps
 
     def compare_maps(self, filename, flux=None):
         # compute flux
@@ -121,5 +122,26 @@ class NeuPlaNetGenerator():
         im = Image.open(filename)#.convert('RGB').convert('L') 
         plt.imshow(np.array(im))
         plt.show()
+        
+    def compare_flux(self, filename, flux_real=None):
+        if flux_real is None:
+            flux_real, _ = utils.get_light_curve(filename, self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+                                        self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
+        flux_real, _ = np.reshape(flux_real, (1, len(flux_real)))
+
+        # generate maps
+        self.generate_maps(flux_real)
+        im = Image.open("tmp_img.png", "r")
+        im = im.resize((im.size[0]*2, im.size[1]))
+        im.save('tmp_img.png')
+        flux_fake, _ = utils.get_light_curve('tmp_img.png', self.cfg['ydeg'], self.cfg['amp'], self.cfg['obl'], 
+                                        self.cfg['inc'], self.cfg['npts'], self.cfg['nrot'])
+        
+        fig, ax = plt.subplots(1, figsize=(12, 4))
+        time = np.linspace(0, 1, self.cfg['npts'])
+        ax.plot(time, flux_real)
+        ax.plot(time, flux_fake)
+        ax.set_xlabel("Orbital phase", fontsize=18)
+        ax.set_ylabel("Normalized flux", fontsize=18)
 
 
