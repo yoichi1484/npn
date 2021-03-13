@@ -31,13 +31,40 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, latent_dim, img_size, channels):
+    def __init__(self, npts, img_size, channels, latent_dim):
         super(Generator, self).__init__()
+        
+        self.n_wave = 1 # 違う帯域で観測した波の数をチャンネルとする。その場合はfluxにチャンネルが入るような形でデータを作り直す必要あり
+        self.npts = npts
 
+        # CNN で光度曲線の特徴抽出
+        self.conv = nn.Sequential(
+            nn.Conv1d(self.n_wave, 8, 10),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.MaxPool1d(5, stride=2),
+            nn.Conv1d(8, 16, 10),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.MaxPool1d(5, stride=2),
+            nn.Conv1d(16, 32, 10),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.MaxPool1d(5, stride=2),
+        )
+        
         self.init_size = img_size // 4
-        self.l1 = nn.Sequential(nn.Linear(latent_dim, 128 * self.init_size ** 2))
+        self.l0 =  nn.Sequential(
+            nn.Linear(32 * 114, 1000), # npts = 1000 のとき
+            #nn.Linear(32 * 2, 1000), # npts = 100 のとき
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(1000, 300),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(300, latent_dim),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(latent_dim, 128 * self.init_size ** 2)
+        )
+       
+        #self.l1 = nn.Sequential(nn.Linear(latent_dim, 128 * self.init_size ** 2))
 
-        self.conv_blocks = nn.Sequential(
+        self.deconv = nn.Sequential(
             nn.BatchNorm2d(128),
             nn.Upsample(scale_factor=2),
             nn.Conv2d(128, 128, 3, stride=1, padding=1),
@@ -52,9 +79,13 @@ class Generator(nn.Module):
         )
 
     def forward(self, z):
-        out = self.l1(z)
+        z = z.view(z.shape[0], self.n_wave, self.npts)
+        z = self.conv(z)
+        z = z.view(z.shape[0], -1)
+        out = self.l0(z)
+        #out = self.l1(z)
         out = out.view(out.shape[0], 128, self.init_size, self.init_size)
-        img = self.conv_blocks(out)
+        img = self.deconv(out)
         return img
 
       
@@ -124,6 +155,7 @@ def main():
     
     # Show configs
     args.latent_dim = fluxes.shape[1]
+    args.npts = fluxes.shape[1]
     print(json.dumps(args.__dict__, indent=2))
     
     # Make a directory for logging
@@ -133,7 +165,7 @@ def main():
         json.dump(args.__dict__, f)
     
     # Initialize generator 
-    generator = Generator(args.latent_dim, args.img_size, args.channels)
+    generator = Generator(args.npts, args.img_size, args.channels, args.latent_dim)
     
     if use_cuda:
         generator.cuda()
@@ -155,7 +187,7 @@ def main():
         for i, (imgs, flux) in enumerate(dataloader):
             
             if args.no_flux:
-                noise = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.latent_dim))))
+                noise = Variable(Tensor(np.random.normal(0, 3, (imgs.shape[0], args.npts))))
             else:
                 noise = Variable(flux.type(Tensor))
                 
