@@ -88,7 +88,7 @@ class NeuPlaNetGenerator():
 
 
     def generate_maps(self, fluxes):
-        flux = np.array([self.preprocessing(flux) for flux in fluxes])
+        fluxes = np.array([self.preprocessing(flux) for flux in fluxes])
         z = torch.from_numpy(fluxes).float().to(self.device)
         with torch.no_grad():
             maps = self.generator(z)
