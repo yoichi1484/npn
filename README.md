@@ -5,7 +5,7 @@ NeuPlaNet dataset / GAN
 ```
 data
   ├── n10000_64x32_bin.zip # zip file of map images
-  └── flux1 
+  └── flux 
         ├── flux.npy       # light curve
         └── configs.json   # configs of computating light curves
 ```
