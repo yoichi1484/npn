@@ -36,7 +36,7 @@ $ python src/cnn_deconv.py \
 
 ## Predict the map from flux
 Setup ```NeuPlaNetGenerator```
-```
+```python
 import numpy as np
 from glob import glob
 import torchvision
@@ -55,7 +55,7 @@ preprocessing = utils.Normalize(fluxes)
 npn = utils.NeuPlaNetGenerator(model_path, generator, preprocessing)
 ```
 Testing
-```
+```python
 idx = 0
 filename = filenames[idx]
 flux = fluxes[idx]
