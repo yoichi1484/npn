@@ -14,6 +14,8 @@ data
 ```
 $ cd data
 $ zip n10000_64x32_bin.zip
+$ wget https://drive.google.com/file/d/1k2f5tFfE4BiQE1lkEG3ovIE35lN1HI8b/view?usp=sharing -O flux
+$ unzip flux.zip
 ```
 
 # Usage
