@@ -22,7 +22,7 @@ Training the map generator
 - DCGAN
 - CNN + DCGAN
 - DeConv
-- CNN + DeConv (bset)
+- CNN + DeConv (**bset**)
 ```
 $ python src/cnn_deconv.py \
   --path_lc data/flux \
