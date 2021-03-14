@@ -40,8 +40,8 @@ Setup ```NeuPlaNetGenerator```
 import numpy as np
 from glob import glob
 import torchvision
-import cnn_deconv as model
-import utils
+import src.cnn_deconv as model
+import src.utils as utils
 
 model_path = "log/[MODEL DIR]"
 lc_path = "data/flux"
