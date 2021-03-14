@@ -60,7 +60,7 @@ idx = 0
 filename = filenames[idx]
 flux = fluxes[idx]
 npn.compare_maps(filename, flux)
-npn.compare_flux(filename, flux)
+npn.compare_light_curves(filename, flux)
 ```
 
 ## Utilities
