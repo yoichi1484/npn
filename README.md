@@ -24,12 +24,13 @@ Training the map generator
 - CNN + DeConv (bset)
 ```
 $ python src/cnn_deconv.py \
-  --path_lc data/flux1 \
+  --path_lc data/flux \
   --path_img data/n10000_64x32_bin \
   --path_log . \
   --gpu_id 0 \
-  --batch_size 16 \
-  --n_epochs 20000 \
+  --batch_size 512 \
+  --n_epochs 500 \
+  # --dry_run # For test run
 ```
 
 Make flux dataset from images
