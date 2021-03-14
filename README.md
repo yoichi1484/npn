@@ -1,4 +1,4 @@
-NeuPlaNet dataset / GAN
+Experimental codes of NeuPlaNet
 ===
 
 # Dataset
