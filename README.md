@@ -17,9 +17,13 @@ $ zip n10000_64x32_bin.zip
 ```
 
 # Usage
-Training DCGAN
+Training the map generator
+- DCGAN
+- CNN + DCGAN
+- DeConv
+- CNN + DeConv (bset)
 ```
-$ python src/dcgan.py \
+$ python src/cnn_deconv.py \
   --path_lc data/flux1 \
   --path_img data/n10000_64x32_bin \
   --path_log . \
@@ -36,13 +40,13 @@ $ python src/make_dataset.py --npts 1000 --path_save data/myflux
 Compute the flux from an image
 ```python
 from src.utils import get_light_curve
-flux = get_light_curve("n10000_64x32_bin/map_00294.png", 
-                        ydeg = 10, 
-                        amp = 1.3, 
-                        obl = 23.5, 
-                        inc = 60, 
-                        npts = 1000, 
-                        nrot = 10)
+flux, map = get_light_curve("n10000_64x32_bin/map_00294.png", 
+                             ydeg = 10, 
+                             amp = 1.3, 
+                             obl = 23.5, 
+                             inc = 60, 
+                             npts = 1000, 
+                             nrot = 10)
 ```
 
 Plot a light curve
