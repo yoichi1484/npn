@@ -42,6 +42,8 @@ from glob import glob
 import torchvision
 import src.cnn_deconv as model
 import src.utils as utils
+import src.neuplanet as npn
+
 
 model_path = "log/[MODEL DIR]"
 lc_path = "data/flux"
@@ -52,15 +54,15 @@ filenames = sorted(glob("{}/*.png".format(path_img)))
 generator = model.Generator(npts=1000, latent_dim=1000, img_size=64, 
                             channels=1)
 preprocessing = utils.Normalize(fluxes)
-npn = utils.NeuPlaNetGenerator(model_path, generator, preprocessing)
+neuplanet = npn.NeuPlaNetGenerator(model_path, generator, preprocessing)
 ```
 Testing
 ```python
 idx = 0
 filename = filenames[idx]
 flux = fluxes[idx]
-npn.compare_maps(filename, flux)
-npn.compare_light_curves(filename, flux)
+neuplanet.compare_maps(filename, flux)
+neuplanet.compare_light_curves(filename, flux)
 ```
 
 ## Utilities
