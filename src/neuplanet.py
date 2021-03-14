@@ -14,13 +14,13 @@ import utils
 
 
 class NeuPlaNet(Dataset):
-    def __init__(self, root_dir, fluxes, n_data, img_size, noize=0.0, transform=None, preprocessing=None):
+    def __init__(self, root_dir, fluxes, n_data, img_size, noise=0.0, transform=None, preprocessing=None):
         # 画像ファイルのパス一覧を取得する。
         self.root_dir = root_dir
         self.filenames = sorted(glob("{}/*.png".format(self.root_dir)))[:n_data]
         self.fluxes = fluxes[:n_data]
         self.img_size = img_size
-        self.noize = noize
+        self.noise = noise
         self.transform = transform
         self.preprocessing = preprocessing
 
@@ -55,7 +55,7 @@ class NeuPlaNet(Dataset):
         return len(self.fluxes)
     
     def add_noise(self, flux):
-        return flux + self.noize * np.random.randn(*flux.shape)
+        return flux + self.noise * np.random.randn(*flux.shape)
 
     
 class NeuPlaNetGenerator():
