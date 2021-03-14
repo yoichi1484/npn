@@ -47,7 +47,7 @@ import src.neuplanet as npn
 
 model_path = "log/[MODEL DIR]"
 lc_path = "data/flux"
-path_img = "n10000_64x32_bin"
+path_img = "data/n10000_64x32_bin"
 fluxes = np.load(lc_path + "/flux.npy")
 filenames = sorted(glob("{}/*.png".format(path_img)))
 
@@ -69,7 +69,7 @@ neuplanet.compare_light_curves(filename, flux)
 Compute the flux from an image
 ```python
 from src.utils import get_light_curve
-flux, map = get_light_curve("n10000_64x32_bin/map_00294.png", 
+flux, map = get_light_curve("data/n10000_64x32_bin/map_00294.png", 
                              ydeg = 10, 
                              amp = 1.3, 
                              obl = 23.5, 
