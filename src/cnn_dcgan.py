@@ -127,6 +127,7 @@ def _parse():
     parser.add_argument("--batch_size", type=int, default=512, help="size of the batches")
     parser.add_argument("--lr", type=float, default=0.0002, help="adam: learning rate")
     parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
+    parser.add_argument("--noize", type=float, default=0.01, help="noize range")
     parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
     parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
     #parser.add_argument("--latent_dim", type=int, default=100, help="dimensionality of the latent space")
@@ -169,6 +170,7 @@ def main():
         fluxes = fluxes, 
         n_data = n_data, 
         img_size = args.img_size, 
+        noize = args.noize,
         transform = transform, 
         preprocessing = preprocessing)
     
