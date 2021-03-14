@@ -4,6 +4,7 @@ import json
 import pprint
 
 #from pathlib import Path
+import torch
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from PIL import Image
@@ -13,12 +14,13 @@ import utils
 
 
 class NeuPlaNet(Dataset):
-    def __init__(self, root_dir, fluxes, n_data, img_size, transform=None, preprocessing=None):
+    def __init__(self, root_dir, fluxes, n_data, img_size, noize=0.0, transform=None, preprocessing=None):
         # 画像ファイルのパス一覧を取得する。
         self.root_dir = root_dir
         self.filenames = sorted(glob("{}/*.png".format(self.root_dir)))[:n_data]
         self.fluxes = fluxes[:n_data]
         self.img_size = img_size
+        self.noize = noize
         self.transform = transform
         self.preprocessing = preprocessing
 
@@ -44,11 +46,16 @@ class NeuPlaNet(Dataset):
 
         if self.preprocessing is not None:
             flux = self.preprocessing(flux)
+            
+        flux = self.add_noise(flux)
 
         return img, flux
 
     def __len__(self):
         return len(self.fluxes)
+    
+    def add_noise(self, flux):
+        return flux + self.noize * np.random.randn(*flux.shape)
 
     
 class NeuPlaNetGenerator():
