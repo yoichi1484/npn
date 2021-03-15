@@ -7,6 +7,7 @@ import pprint
 import torch
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
+from torchvision.utils import save_image
 from PIL import Image
 import matplotlib.pyplot as plt
 
